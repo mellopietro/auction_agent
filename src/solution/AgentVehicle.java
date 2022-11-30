@@ -1,5 +1,6 @@
 package solution;
 
+import logist.plan.Plan;
 import logist.simulation.Vehicle;
 import logist.task.Task;
 import logist.topology.Topology;
@@ -97,6 +98,31 @@ public class AgentVehicle {
         step.add(assignment.deliveryPosition+2, deliveryStep);
         afterDeliveryStep.cost = afterDeliveryStep.getCurrentCity() == null ? 0 : (long) (task.deliveryCity.distanceTo(afterDeliveryStep.currentCity) * costPerKm);
 
+    }
+
+    public Plan computePlan(AgentVehicle agentVehicle){
+
+        int len = agentVehicle.step.size();
+        // città iniziale per il primo step che ha action 0
+        Topology.City current = agentVehicle.step.get(0).getCurrentCity();
+        Plan plan = new Plan(current);
+        // piano per le altre azioni
+        for (int i=1; i < len; i++){
+            Topology.City nextCity = agentVehicle.step.get(i).getCurrentCity();
+            Task task = agentVehicle.step.get(i).getDealtTask();
+            for (Topology.City city : current.pathTo(task.pickupCity)) {
+                plan.appendMove(city);
+            }
+            if (agentVehicle.step.get(i).getAction() == 1){
+                plan.appendPickup(task);
+                current = task.pickupCity;
+            }
+            else{
+                plan.appendDelivery(task);
+                current = task.deliveryCity;
+            }
+        }
+        return plan;
     }
 
 
