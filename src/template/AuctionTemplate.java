@@ -14,6 +14,7 @@ import logist.task.TaskDistribution;
 import logist.task.TaskSet;
 import logist.topology.Topology;
 import logist.topology.Topology.City;
+import solution.AgentVehicle;
 import solution.Solution;
 
 /**
@@ -65,13 +66,19 @@ public class AuctionTemplate implements AuctionBehavior {
 	public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
 		
 		System.out.println("Agent " + agent.id() + " has tasks " + tasks);
-
-		Plan planVehicle1 = naivePlan(vehicle, tasks);
-
 		List<Plan> plans = new ArrayList<Plan>();
-		plans.add(planVehicle1);
-		while (plans.size() < vehicles.size())
-			plans.add(Plan.EMPTY);
+		List<AgentVehicle> Vehicles = solution.getPlayerVehicles();
+		int len = Vehicles.size();
+		for (int i=0; i<len; i++){
+			plans.add(Vehicles.get(i).computePlan(Vehicles.get(i)));
+		}
+
+		//Plan planVehicle1 = naivePlan(vehicle, tasks);
+
+
+		//plans.add(planVehicle1);
+		//while (plans.size() < vehicles.size())
+			//plans.add(Plan.EMPTY);
 
 		return plans;
 	}

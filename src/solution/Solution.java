@@ -56,4 +56,7 @@ public class Solution {
                         opponentCost += bids[winner];
                 }
         }
+        public List<AgentVehicle> getPlayerVehicles(){
+                return playerVehicles;
+        }
 }
