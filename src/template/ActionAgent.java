@@ -23,7 +23,7 @@ import solution.Solution;
  * 
  */
 @SuppressWarnings("unused")
-public class AuctionTemplate implements AuctionBehavior {
+public class ActionAgent implements AuctionBehavior {
 
 	private Solution solution;
 	private Topology topology;

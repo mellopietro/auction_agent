@@ -60,7 +60,7 @@ public class AgentVehicle {
                 if (bestAssignment.marginalCost > marginalCost) {
                     bestAssignment.marginalCost = marginalCost;
                     bestAssignment.pickPosition = pick;
-                    bestAssignment.deliveryPosition = pick;
+                    bestAssignment.deliveryPosition = delivery;
                 }
             }
         }
@@ -82,6 +82,8 @@ public class AgentVehicle {
 
     public void addTaskToVehicle(Task task, TaskAssignment assignment) {
         if (assignment.vehicleId != id) return;
+
+        tasks.add(task);
         PlanStep beforePickStep = step.get(assignment.pickPosition), afterPickStep = step.get(assignment.pickPosition+1);
         long beforePickCost = beforePickStep.getCurrentCity() == null ? 0 : (long) (beforePickStep.currentCity.distanceTo(task.pickupCity) * costPerKm);
         PlanStep pickStep = new PlanStep(1, beforePickCost, beforePickStep.capacity-task.weight, task.pickupCity, task);
