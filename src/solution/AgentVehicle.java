@@ -102,24 +102,24 @@ public class AgentVehicle {
 
     public Plan computePlan(AgentVehicle agentVehicle){
 
-        int len = agentVehicle.step.size();
+        int len = agentVehicle.step.size()-1;
         // città iniziale per il primo step che ha action 0
-        Topology.City current = agentVehicle.step.get(0).getCurrentCity();
-        Plan plan = new Plan(current);
+        Topology.City currentCity = agentVehicle.step.get(0).getCurrentCity();
+        Plan plan = new Plan(currentCity);
         // piano per le altre azioni
         for (int i=1; i < len; i++){
             Topology.City nextCity = agentVehicle.step.get(i).getCurrentCity();
             Task task = agentVehicle.step.get(i).getDealtTask();
-            for (Topology.City city : current.pathTo(task.pickupCity)) {
+            for (Topology.City city : currentCity.pathTo(nextCity)) {
                 plan.appendMove(city);
             }
             if (agentVehicle.step.get(i).getAction() == 1){
                 plan.appendPickup(task);
-                current = task.pickupCity;
+                currentCity = task.pickupCity;
             }
             else{
                 plan.appendDelivery(task);
-                current = task.deliveryCity;
+                currentCity = task.deliveryCity;
             }
         }
         return plan;
