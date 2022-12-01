@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1106c747-e8d7-483a-a4a0-6fc8e47b85de" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/auction_agent.iml" beforeDir="false" afterPath="$PROJECT_DIR$/auction_agent.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/solution/Solution.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/solution/Solution.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/template/AuctionTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/template/AuctionTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/history.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,12 +25,37 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/Riccardo Vianello/OneDrive - Politecnico di Milano/ERASMUS/Corsi/Intelligent agents/logist.jar",
-    "project.structure.last.edited": "Libraries",
+    "last_opened_file_path": "C:/Users/Riccardo Vianello/OneDrive - epfl.ch/auction_agent/logist",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="Auction" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="openjdk-19" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="logist.LogistPlatform" />
+      <module name="auction_agent" />
+      <option name="PROGRAM_PARAMETERS" value="config/auction.xml auction-random1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="auction_agent" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="auction_agent" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

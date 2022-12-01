@@ -3,7 +3,8 @@ package solution;
 import logist.agent.Agent;
 import logist.task.Task;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Solution {
 
@@ -42,9 +43,23 @@ public class Solution {
                         }
                 }
                 int taskPlayer = playerVehicles.stream().mapToInt(agentVehicle -> agentVehicle.getTasks().size()).sum();
-                int taskOpponent = opponentVehicles.stream().mapToInt(agentVehicle -> agentVehicle.getTasks().size()).sum();
+                int taskOpponent = opponentVehicles.stream().mapToInt(opponentVehicles -> opponentVehicles.getTasks().size()).sum();
                 assert lastPlayerAssignment != null;
-                return (long) (lastPlayerAssignment.marginalCost * (1+growingFactor * taskPlayer));
+                double weight = 0;
+                if (taskPlayer + taskOpponent > 6){
+                        weight = (0.5 + (double)(taskPlayer + taskOpponent - 6)/(taskPlayer + taskOpponent + 14));
+                }
+                long test = (long)weight;
+                long bid;
+                if (lastPlayerAssignment.marginalCost>lastOpponentAssignment.marginalCost){
+                        bid = (long)(lastPlayerAssignment.marginalCost);
+                }
+                else {
+                        bid = ((1 - test) * lastPlayerAssignment.marginalCost + test * lastOpponentAssignment.marginalCost);
+                }
+                bid = bid + 500;
+                //return (long) (lastPlayerAssignment.marginalCost * (1+growingFactor * taskPlayer));
+                return (long)(bid* (1+growingFactor * taskPlayer));
         }
 
         public void addTaskToPlan(Task task, int winner, Long[] bids) {
