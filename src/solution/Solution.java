@@ -1,78 +1,80 @@
 package solution;
 
 import logist.agent.Agent;
+import logist.simulation.Vehicle;
 import logist.task.Task;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Solution {
-
-        private double growingFactor = 0.1;
-        private List<AgentVehicle> playerVehicles;
+        int costPerKm;
+        private double growingFactor = 1;
         private int playerId;
-        private long playerCost;
-        private List<AgentVehicle> opponentVehicles;
-        private int opponentId;
-        private long opponentCost;
-        private TaskAssignment lastPlayerAssignment, lastOpponentAssignment;
+        private List<List<AgentVehicle>> playersVehicles;
+        private List<Long> playersTotalReward;
+        private List<TaskAssignment> lastPlayerAssignment;
 
         public Solution(Agent player) {
-                playerVehicles = player.vehicles().stream().map(AgentVehicle::new).toList();
-                opponentVehicles = new LinkedList<>();
-                for (int i=0; i<playerVehicles.size(); i++) {
-                       opponentVehicles.add(new AgentVehicle(playerVehicles.stream().mapToInt(AgentVehicle::getCostPerKm).min().getAsInt()));
-                }
+                costPerKm = player.vehicles().stream().mapToInt(Vehicle::costPerKm).min().getAsInt();
                 playerId = player.id();
-                playerCost = 0;
-                opponentCost = 0;
+                playersVehicles = new ArrayList<>();
+                playersTotalReward = new ArrayList<>();
+                for (int i=0; i<playerId; i++) {
+                        playersVehicles.add(player.vehicles().stream().map(vehicle -> new AgentVehicle(costPerKm)).toList());
+                        playersTotalReward.add(0L);
+                }
+                playersVehicles.add(player.vehicles().stream().map(AgentVehicle::new).toList());
+                playersTotalReward.add(0L);
         }
 
         public long computeBid(Task task) {
-                lastPlayerAssignment = null; lastOpponentAssignment = null;
-                for (AgentVehicle vehicle : playerVehicles) {
-                       TaskAssignment currentAssignment = vehicle.computeMarginalCost(task);
-                       if (lastPlayerAssignment == null || lastPlayerAssignment.marginalCost > currentAssignment.marginalCost) {
-                               lastPlayerAssignment = currentAssignment;
-                       }
-                }
-                for (AgentVehicle vehicle : opponentVehicles) {
-                        TaskAssignment currentAssignment = vehicle.computeMarginalCost(task);
-                        if (lastOpponentAssignment == null || lastOpponentAssignment.marginalCost > currentAssignment.marginalCost) {
-                                lastOpponentAssignment = currentAssignment;
+                List<Integer> playersTaskNumber = new ArrayList<>();
+                List<Double> playersMinBid = new ArrayList<>();
+
+                lastPlayerAssignment = new ArrayList<>();
+                int i=0;
+                for (List<AgentVehicle> vehicles : playersVehicles) {
+                        TaskAssignment bestAssignment = null;
+                        for (AgentVehicle vehicle : vehicles) {
+                                TaskAssignment currentAssignment = vehicle.computeMarginalCost(task);
+                                if (bestAssignment == null || bestAssignment.marginalCost > currentAssignment.marginalCost) {
+                                        bestAssignment = currentAssignment;
+                                }
                         }
+                        long cost = vehicles.stream().flatMap(agentVehicle -> agentVehicle.getStep().stream()).mapToLong(planStep -> planStep.cost).sum();
+                        int taskNumber = vehicles.stream().mapToInt(agentVehicle -> agentVehicle.getTasks().size()).sum();
+                        playersTaskNumber.add(taskNumber);
+                        playersMinBid.add(taskNumber == 0 ? 0.8 * bestAssignment.marginalCost : bestAssignment.marginalCost * (1 + growingFactor + (double) playersTotalReward.get(i) / cost));
+                        lastPlayerAssignment.add(bestAssignment);
+                        i++;
                 }
-                int taskPlayer = playerVehicles.stream().mapToInt(agentVehicle -> agentVehicle.getTasks().size()).sum();
-                int taskOpponent = opponentVehicles.stream().mapToInt(opponentVehicles -> opponentVehicles.getTasks().size()).sum();
-                assert lastPlayerAssignment != null;
-                double weight = 0;
-                if (taskPlayer + taskOpponent > 6){
-                        weight = (0.5 + (double)(taskPlayer + taskOpponent - 6)/(taskPlayer + taskOpponent + 14));
+
+                int taskNumber = playersTaskNumber.stream().mapToInt(number -> number).sum();
+                double averageBid = playersMinBid.stream().mapToDouble(bid -> bid).average().getAsDouble();
+
+                double weight = 0.5;
+                if (taskNumber > 6) {
+                        weight = (0.5 + (double)(taskNumber - 6)/(taskNumber + 14));
                 }
-                long test = (long)weight;
-                long bid;
-                if (lastPlayerAssignment.marginalCost>lastOpponentAssignment.marginalCost){
-                        bid = (long)(lastPlayerAssignment.marginalCost);
-                }
-                else {
-                        bid = ((1 - test) * lastPlayerAssignment.marginalCost + test * lastOpponentAssignment.marginalCost);
-                }
-                bid = bid + 500;
-                //return (long) (lastPlayerAssignment.marginalCost * (1+growingFactor * taskPlayer));
-                return (long)(bid* (1+growingFactor * taskPlayer));
+
+                return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid);
         }
 
         public void addTaskToPlan(Task task, int winner, Long[] bids) {
-                if (playerId == winner) {
-                        playerVehicles.forEach(vehicle -> vehicle.addTaskToVehicle(task, lastPlayerAssignment));
-                        playerCost += bids[winner];
-                } else {
-                        opponentVehicles.forEach(vehicle -> vehicle.addTaskToVehicle(task, lastOpponentAssignment));
-                        opponentCost += bids[winner];
+                if (bids.length > playersVehicles.size()) {
+                        int newAgents = bids.length-playersVehicles.size();
+                        for (int i=0; i<newAgents; i++) {
+                                playersVehicles.add(playersVehicles.get(playerId).stream().map(vehicle -> new AgentVehicle(costPerKm)).toList());
+                                playersTotalReward.add(0L);
+                        }
                 }
+                playersVehicles.get(winner).forEach(vehicle -> vehicle.addTaskToVehicle(task, lastPlayerAssignment.get(winner)));
+                playersTotalReward.set(winner, playersTotalReward.get(winner) + bids[winner] - lastPlayerAssignment.get(winner).marginalCost);
         }
 
         public List<AgentVehicle> getPlayerVehicles(){
-                return playerVehicles;
+                return playersVehicles.get(playerId);
         }
 }

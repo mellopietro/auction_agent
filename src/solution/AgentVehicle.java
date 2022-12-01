@@ -14,8 +14,8 @@ public class AgentVehicle {
     private final Topology.City homeCity;
     private final int costPerKm;
     private List<Task> tasks;
+
     private List<PlanStep> step;
-    private long totalCost;
 
     public AgentVehicle(Vehicle vehicle) {
         this.id = vehicle.id();
@@ -148,4 +148,8 @@ public class AgentVehicle {
         return tasks;
     }
 
+    public List<PlanStep> getStep() {
+        return step;
+    }
+    
 }
