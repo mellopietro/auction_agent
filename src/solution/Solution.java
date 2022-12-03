@@ -54,12 +54,12 @@ public class Solution {
                 int taskNumber = playersTaskNumber.stream().mapToInt(number -> number).sum();
                 double averageBid = playersMinBid.stream().mapToDouble(bid -> bid).average().getAsDouble();
 
-                double weight = 0.5;
+                double weight = 0.2;
                 if (taskNumber > 6) {
-                        weight = (0.5 + (double)(taskNumber - 6)/(taskNumber + 14));
+                        weight = (0.2 + (double)(taskNumber - 6)/(taskNumber + 12));
                 }
 
-                return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid);
+                return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + 200;
         }
 
         public void addTaskToPlan(Task task, int winner, Long[] bids) {
