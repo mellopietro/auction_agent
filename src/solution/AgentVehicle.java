@@ -5,6 +5,7 @@ import logist.simulation.Vehicle;
 import logist.task.Task;
 import logist.topology.Topology;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -125,6 +126,28 @@ public class AgentVehicle {
             }
         }
         return plan;
+    }
+
+    public List<Topology.City> visitedCities (TaskAssignment taskAssignment, Task task){
+        List<Topology.City> visited = new ArrayList<>();
+        Topology.City current = task.pickupCity;
+        if (taskAssignment.pickPosition == taskAssignment.deliveryPosition){
+            return current.pathTo(task.deliveryCity);
+        }
+        for (int i=taskAssignment.pickPosition+1; i<taskAssignment.deliveryPosition+1; i++){
+            for (Topology.City city : current.pathTo(step.get(i).currentCity)){
+                if (!visited.contains(city)){
+                    visited.add(city);
+                }
+            }
+            current = step.get(i).currentCity;
+        }
+        for (Topology.City city: current.pathTo(task.deliveryCity)){
+            if (!visited.contains(city)){
+                visited.add(city);
+            }
+        }
+        return visited;
     }
 
 

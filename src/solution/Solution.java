@@ -42,13 +42,21 @@ public class Solution {
 
                 lastPlayerAssignment = new ArrayList<>();
                 int i=0;
+                int betterVehicle = 0;
+                TaskAssignment betterAssignment = null;
                 for (List<AgentVehicle> vehicles : playersVehicles) {
                         TaskAssignment bestAssignment = null;
+                        int j = 0;
                         for (AgentVehicle vehicle : vehicles) {
                                 TaskAssignment currentAssignment = vehicle.computeMarginalCost(task);
                                 if (bestAssignment == null || bestAssignment.marginalCost > currentAssignment.marginalCost) {
                                         bestAssignment = currentAssignment;
+                                        if (i==0){
+                                                betterVehicle = j;
+                                                betterAssignment = currentAssignment;
+                                        }
                                 }
+                                j++;
                         }
                         long cost = vehicles.stream().flatMap(agentVehicle -> agentVehicle.getStep().stream()).mapToLong(planStep -> planStep.cost).sum();
                         int taskNumber = vehicles.stream().mapToInt(agentVehicle -> agentVehicle.getTasks().size()).sum();
@@ -68,7 +76,8 @@ public class Solution {
 
                 // compute prob of having a task in the path of the current task
                 double factor = 0;
-                for(Topology.City city: task.path()){
+                List<Topology.City> Path = playersVehicles.get(0).get(betterVehicle).visitedCities(betterAssignment, task);
+                for(Topology.City city: Path){
                         factor = factor + distribution.probability(task.pickupCity,city) + distribution.probability(city,task.deliveryCity);
                 }
 
