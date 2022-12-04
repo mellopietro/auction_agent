@@ -47,7 +47,8 @@ public class AuctionAgent implements AuctionBehavior {
 		long seed = -9019555669489983951L * currentCity.hashCode() * agent.id();
 		this.random = new Random(seed);
 
-		solution = new Solution(agent);
+		//modified constructor
+		solution = new Solution(agent, distribution);
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package solution;
 import logist.agent.Agent;
 import logist.simulation.Vehicle;
 import logist.task.Task;
+import logist.task.TaskDistribution;
+import logist.topology.Topology;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -15,8 +17,10 @@ public class Solution {
         private List<List<AgentVehicle>> playersVehicles;
         private List<Long> playersTotalReward;
         private List<TaskAssignment> lastPlayerAssignment;
+        // added for distribution
+        private TaskDistribution distribution;
 
-        public Solution(Agent player) {
+        public Solution(Agent player, TaskDistribution distr) {
                 costPerKm = player.vehicles().stream().mapToInt(Vehicle::costPerKm).min().getAsInt();
                 playerId = player.id();
                 playersVehicles = new ArrayList<>();
@@ -27,6 +31,9 @@ public class Solution {
                 }
                 playersVehicles.add(player.vehicles().stream().map(AgentVehicle::new).toList());
                 playersTotalReward.add(0L);
+
+                // added to solution
+                distribution = distr;
         }
 
         public long computeBid(Task task) {
@@ -59,7 +66,18 @@ public class Solution {
                         weight = (0.2 + (double)(taskNumber - 6)/(taskNumber + 12));
                 }
 
+                // compute prob of having a task in the path of the current task
+                double factor = 0;
+                for(Topology.City city: task.path()){
+                        factor = factor + distribution.probability(task.pickupCity,city) + distribution.probability(city,task.deliveryCity);
+                }
+
+                // previous bid
                 return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + 200;
+                //bid with factor
+                //long increase = (long)((1.3-factor)*350);
+                //long bid = (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + increase;
+                //return bid;
         }
 
         public void addTaskToPlan(Task task, int winner, Long[] bids) {
