@@ -85,6 +85,9 @@ public class Solution {
                 // return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + 350;
                 //bid with factor
                 long increase = (long)((1.3-factor)*350);
+                if (increase < 0){
+                        increase = 0;
+                }
                 long bid = (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + increase;
                 return bid;
         }
