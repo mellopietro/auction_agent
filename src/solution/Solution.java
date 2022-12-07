@@ -82,11 +82,11 @@ public class Solution {
                 }
 
                 // previous bid
-                return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + 200;
+                // return (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + 350;
                 //bid with factor
-                //long increase = (long)((1.3-factor)*350);
-                //long bid = (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + increase;
-                //return bid;
+                long increase = (long)((1.3-factor)*350);
+                long bid = (long) ((1 - weight) * playersMinBid.get(playerId) + weight * averageBid) + increase;
+                return bid;
         }
 
         public void addTaskToPlan(Task task, int winner, Long[] bids) {
@@ -96,6 +96,9 @@ public class Solution {
                                 playersVehicles.add(playersVehicles.get(playerId).stream().map(vehicle -> new AgentVehicle(costPerKm)).toList());
                                 playersTotalReward.add(0L);
                         }
+                }
+                if (lastPlayerAssignment.size() <= winner) {
+                        computeBid(task);
                 }
                 playersVehicles.get(winner).forEach(vehicle -> vehicle.addTaskToVehicle(task, lastPlayerAssignment.get(winner)));
                 playersTotalReward.set(winner, playersTotalReward.get(winner) + bids[winner] - lastPlayerAssignment.get(winner).marginalCost);
